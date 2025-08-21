@@ -8,7 +8,6 @@ This repository provides Oracle PL/SQL integration examples for invoking an Olla
 - `examples/test_call.sql` — example anonymous block showing how to call the function.
 - `images/architecture.png` — architecture diagram (attached).
 - `LICENSE` — MIT license.
-- `.gitignore`
 
 > Architecture diagram (also in `images/architecture.png`):
 
@@ -121,6 +120,7 @@ COMMIT;
 ---
 
 ## License
+MIT
 
 ---
 
