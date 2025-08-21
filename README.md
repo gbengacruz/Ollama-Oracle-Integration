@@ -82,9 +82,6 @@ Creates `FN_OLLAMA_GENAI` — a complete function that:
 
 > See the SQL file for the full implementation.
 
-### `sql/fn_ollama_genai_v2.sql`
-A starter file for extended functionality (streaming, richer headers, logging). Use as a base to implement streaming or advanced error handling.
-
 ### `examples/test_call.sql`
 A small test script demonstrating how to call the function and print the first 4000 characters of response.
 
