@@ -10,7 +10,7 @@ This repository provides Oracle PL/SQL integration examples for invoking an Olla
 
 > Architecture diagram (also in `images/architecture.png`):
 
-<img src="img/architecture.png" alt="Architecture" width="500" height="300"/>
+<img src="img/architecture.png" alt="Architecture" width="800" height="500"/>
 
 
 ---
