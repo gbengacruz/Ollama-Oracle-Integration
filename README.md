@@ -4,9 +4,8 @@ This repository provides Oracle PL/SQL integration examples for invoking an Olla
 
 **Included**
 - `sql/fn_ollama_genai.sql` — production-ready PL/SQL function (based on user-provided code) that calls Ollama and returns a CLOB response.
-- `sql/fn_ollama_genai_v2.sql` — template for a streaming / extended version (skeleton).
 - `examples/test_call.sql` — example anonymous block showing how to call the function.
-- `images/architecture.png` — architecture diagram (attached).
+- `images/architecture.png` — architecture diagram.
 - `LICENSE` — MIT license.
 
 > Architecture diagram (also in `images/architecture.png`):
