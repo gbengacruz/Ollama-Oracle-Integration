@@ -67,7 +67,7 @@ BEGIN
 END;
 /
 
--- Example 2: Complete workflow with execution
+-- Example 2: Complete workflow with execution with json results
 DECLARE
     l_results CLOB;
     l_status  VARCHAR2(100);
