@@ -3,7 +3,7 @@
 This repository provides Oracle PL/SQL integration examples for invoking an Ollama LLM service from inside the database (using `APEX_WEB_SERVICE`), plus documentation and an architecture diagram.
 
 **Included**
-- `sql/pkg_ollama.sql, sql/pkg_ollama.plb`  — production-ready PL/SQL function (based on user-provided code) that calls Ollama and returns a CLOB response.
+- `sql/pkg_ollama.sql, sql/pkg_ollama.plb`  — production-ready PL/SQL package (based on user-provided code) that calls Ollama and returns a CLOB response.
 - `examples/test_call.sql` — example anonymous block showing how to call the function.
 - `images/architecture.png` — architecture diagram.
 - `LICENSE` — MIT license.
