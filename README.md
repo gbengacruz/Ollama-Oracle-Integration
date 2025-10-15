@@ -43,7 +43,8 @@ These functions let you send a prompt (optionally including a table schema from 
 1. Place `images/architecture.png` at the repository root or in `images/`.
 2. Run the SQL script to create the function:
 ```sql
-@sql/fn_ollama_genai.sql
+@sql/pkg_ollama.sql
+@sql/pkg_ollama.plb
 ```
 3. Test with the example in `examples/test_call.sql`.
 
@@ -54,17 +55,49 @@ These functions let you send a prompt (optionally including a table schema from 
 Call the function from a PL/SQL block:
 
 ```sql
+-- Example 1: Generate SQL for a table
 DECLARE
-  l_clob CLOB;
+    l_sql CLOB;
 BEGIN
-  l_clob := FN_OLLAMA_GENAI(
-    p_table_name    => 'EMPLOYEES',
-    p_user_prompt   => 'Name of highest paid staff',
-    p_model         => 'llama3.1:8b',
-    p_ollama_host   => 'https://oci.dropletssoftware.com/ollama',
-    p_response_mode => 3
-  );
-  DBMS_OUTPUT.PUT_LINE(DBMS_LOB.SUBSTR(l_clob, 4000, 1));
+    l_sql := pkg_ollama.generate_sql_from_ollama(
+        p_table_name => 'EMPLOYEES',
+        p_user_prompt => 'show me the top 5 highest paid employees'
+    );
+    DBMS_OUTPUT.PUT_LINE('Generated SQL: ' || l_sql);
+END;
+/
+
+-- Example 2: Complete workflow with execution
+DECLARE
+    l_results CLOB;
+    l_status  VARCHAR2(100);
+    l_error   VARCHAR2(4000);
+BEGIN
+    pkg_ollama.execute_generated_sql(
+        p_table_name => 'SALES',
+        p_user_prompt => 'show monthly sales trends for 2024',
+        p_results => l_results,
+        p_status => l_status,
+        p_error_msg => l_error
+    );
+    
+    IF l_status = 'SUCCESS' THEN
+        DBMS_OUTPUT.PUT_LINE('Results: ' || l_results);
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Error: ' || l_error);
+    END IF;
+END;
+/
+
+-- Example 3: Get AI insights
+DECLARE
+    l_insight CLOB;
+BEGIN
+    l_insight := pkg_ollama.get_ollama_insight(
+        p_model => 'llama3.1:8b',
+        p_question => 'What are the benefits of cloud data warehouses?'
+    );
+    DBMS_OUTPUT.PUT_LINE('Insight: ' || l_insight);
 END;
 /
 ```
