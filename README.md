@@ -106,7 +106,7 @@ END;
 
 ## Files
 
-### `sql/fn_ollama_genai.sql`
+### `sql/pkg_ollama.sql` ,  `sql/pkg_ollama.plb`
 Creates `pkg_ollama` — a complete package that:
 - Optionally builds a table schema context from `USER_TAB_COLUMNS` when `p_table_name` is supplied.
 - Constructs a JSON body and posts to the Ollama `/api/generate` endpoint.
