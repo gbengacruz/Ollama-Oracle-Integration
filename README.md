@@ -22,7 +22,6 @@ These functions let you send a prompt (optionally including a table schema from 
 **Design goals**
 - Minimal, easy-to-deploy PL/SQL function.
 - Optionally include the database table schema to provide context to the model.
-- Multiple response modes (human-readable, JSON, both).
 - Clear error handling and a useful example for testing.
 
 ---
