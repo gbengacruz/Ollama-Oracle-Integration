@@ -8,7 +8,7 @@ This repository provides Oracle PL/SQL integration examples for invoking an Olla
 - `images/architecture.png` — architecture diagram.
 - `LICENSE` — MIT license.
 
-> Architecture diagram (also in `images/architecture.png`):
+> Architecture diagram:
 
 <img src="img/architecture.png" alt="Architecture" width="800" height="500"/>
 
