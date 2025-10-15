@@ -21,9 +21,9 @@ These functions let you send a prompt (optionally including a table schema from 
 
 **Design goals**
 - Minimal, easy-to-deploy PL/SQL function.
-- Optionally include database table schema to provide context to the model.
+- Optionally include the database table schema to provide context to the model.
 - Multiple response modes (human-readable, JSON, both).
-- Clear error handling and useful example for testing.
+- Clear error handling and a useful example for testing.
 
 ---
 
@@ -32,7 +32,8 @@ These functions let you send a prompt (optionally including a table schema from 
 1. Oracle Database (12c+ recommended) with `APEX_WEB_SERVICE` package available (APEX or APEX runtime).
 2. Network access from the database host to the Ollama server (or proxy). If the DB server blocks outbound HTTP(S), configure Oracle Network ACLs.
 3. Database user with privileges to create functions and use `DBMS_LOB`, `DBMS_OUTPUT`, and `APEX_WEB_SERVICE`.
-4. (Optional) If you intend to log queries and responses, create a secure schema/table to store logs.
+4. (Optional) Install ollama or replace gc_ollama_endpoint on the package pkg_ollama with the existing ollama api url.
+5. (Optional) If you intend to log queries and responses, create a secure schema/table to store logs.
 
 **Common issue:** `ORA-24247: network access denied by access control list (ACL)` — fix by creating and granting an ACL with `DBMS_NETWORK_ACL_ADMIN` or via Oracle DB security admin.
 
@@ -40,8 +41,7 @@ These functions let you send a prompt (optionally including a table schema from 
 
 ## Deployment
 
-1. Place `images/architecture.png` at the repository root or in `images/`.
-2. Run the SQL script to create the function:
+1. Run the SQL script to create the package:
 ```sql
 @sql/pkg_ollama.sql
 @sql/pkg_ollama.plb
