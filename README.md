@@ -1,4 +1,4 @@
-# Ollama ↔ Oracle Database Integration
+# Ollama-llama ↔ Oracle Database Integration
 
 This repository provides Oracle PL/SQL integration examples for invoking an Ollama LLM service from inside the database (using `APEX_WEB_SERVICE`), plus documentation and an architecture diagram.
 
