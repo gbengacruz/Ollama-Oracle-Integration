@@ -1,4 +1,4 @@
-# Ollama-llama ↔ Oracle Database Integration
+# Ollama ↔ Oracle Database Integration
 
 This repository provides Oracle PL/SQL integration examples for invoking an Ollama LLM service from inside the database (using `APEX_WEB_SERVICE`), plus documentation and an architecture diagram.
 
@@ -23,6 +23,7 @@ These functions let you send a prompt (optionally including a table schema from 
 - Minimal, easy-to-deploy PL/SQL function.
 - Optionally include the database table schema to provide context to the model.
 - Clear error handling and a useful example for testing.
+- Supported model - llama
 
 ---
 
