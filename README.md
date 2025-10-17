@@ -127,16 +127,15 @@ END;
 - `ORA-24247`: configure network ACLs:
 ```sql
 BEGIN
-  DBMS_NETWORK_ACL_ADMIN.create_acl(
-    acl => 'web_services_acl.xml',
-    description => 'Allow web service access',
-    principal => 'YOUR_SCHEMA',
-    is_grant => TRUE,
-    privilege => 'connect'
-  );
-  DBMS_NETWORK_ACL_ADMIN.assign_acl(
-    acl => 'web_services_acl.xml',
-    host => 'oci.dropletssoftware.com'
+  DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE(
+    host => 'localhost',
+    lower_port => 443,
+    upper_port => 443,
+    ace => xs$ace_type(
+      privilege_list => xs$name_list('connect'),
+      principal_name => '<your_schema>',
+      principal_type => xs_acl.ptype_db
+    )
   );
 END;
 /
