@@ -32,7 +32,7 @@ These functions let you send a prompt (optionally including a table schema from 
 1. Oracle Database (12c+ recommended) with `APEX_WEB_SERVICE` package available (APEX).
 2. Install ollama and pull the llama3 model on your local server (Check https://ollama.com/ for instructions)
 3. Network access from the database host to the Ollama server (or proxy). If the DB server blocks outbound HTTP(S), configure Oracle Network ACLs.
-4. Database user with privileges to create functions and use `DBMS_LOB`, `DBMS_OUTPUT`, and `APEX_WEB_SERVICE`.
+4. Database user with privileges to create functions and use `DBMS_LOB` and `APEX_WEB_SERVICE`.
 5. (Optional) Install ollama or replace gc_ollama_endpoint on the package pkg_ollama with the existing ollama api url.
 6. (Optional) If you intend to log queries and responses, create a secure schema/table to store logs.
 
