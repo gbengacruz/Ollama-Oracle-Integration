@@ -66,9 +66,10 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Generated SQL: ' || l_sql);
 END;
 /
+```
 <img src="img/ollama1.png" alt="ollama1" width="800" height="500"/>
 
-
+```sql
 -- Example 2: Complete workflow with execution with json results
 DECLARE
     l_results CLOB;
@@ -90,8 +91,9 @@ BEGIN
     END IF;
 END;
 /
+```
 <img src="img/ollama2.png" alt="ollama2" width="800" height="500"/>
-
+```sql
 -- Example 3: Get AI insights
 DECLARE
     l_insight CLOB;
