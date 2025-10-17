@@ -29,7 +29,7 @@ These functions let you send a prompt (optionally including a table schema from 
 
 ## Prerequisites
 
-1. Oracle Database (12c+ recommended) with `APEX_WEB_SERVICE` package available (APEX or APEX runtime).
+1. Oracle Database (12c+ recommended) with `APEX_WEB_SERVICE` package available (APEX).
 2. Network access from the database host to the Ollama server (or proxy). If the DB server blocks outbound HTTP(S), configure Oracle Network ACLs.
 3. Database user with privileges to create functions and use `DBMS_LOB`, `DBMS_OUTPUT`, and `APEX_WEB_SERVICE`.
 4. (Optional) Install ollama or replace gc_ollama_endpoint on the package pkg_ollama with the existing ollama api url.
