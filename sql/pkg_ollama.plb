@@ -8,23 +8,29 @@ create or replace PACKAGE BODY pkg_ollama AS
     * FUNCTION: query_to_json_array
     * Converts any SELECT query results to JSON array format
     */
-    FUNCTION query_to_json_array (
-        p_query IN CLOB
-    ) RETURN NCLOB IS
-        l_sql   CLOB;
-        l_json  CLOB;
-        l_out   NCLOB;
+    FUNCTION query_to_json_array (p_query IN CLOB) RETURN NCLOB IS
+        l_validation VARCHAR2(4000);
+        l_sql CLOB;
+        l_json CLOB;
+        l_out NCLOB;
     BEGIN
         IF p_query IS NULL OR TRIM(p_query) = '' THEN
-            RAISE_APPLICATION_ERROR(-20020, 'p_query is required and must be a SELECT statement');
+            RAISE_APPLICATION_ERROR(-20020, 'p_query is required');
         END IF;
 
-        -- Build JSON aggregation SQL
+        -- MANDATORY: Validate before any dynamic SQL
+        l_sql := replace(trim(p_query),';','');
+        l_validation := validate_sql_syntax(l_sql);
+        IF l_validation != 'VALID' THEN
+            RETURN TO_NCLOB('{"error":"Invalid query"}');
+        END IF;
+
+     -- Build JSON aggregation SQL
         l_sql :=
             'SELECT COALESCE(' ||
             '  JSON_ARRAYAGG(JSON_OBJECT(*) RETURNING CLOB),' ||
             '  TO_CLOB(''[]'')' ||
-            ') AS j FROM (' || p_query || ') q';
+            ') AS j FROM (' || l_sql || ') q';
 
         -- Execute and fetch as CLOB
         EXECUTE IMMEDIATE l_sql INTO l_json;
@@ -33,11 +39,12 @@ create or replace PACKAGE BODY pkg_ollama AS
         l_out := TO_NCLOB(l_json);
 
         RETURN l_out;
-
+        
     EXCEPTION
         WHEN OTHERS THEN
             RETURN TO_NCLOB('{"error":"' || REPLACE(SQLERRM, '"', '\"') || '"}');
     END query_to_json_array;
+    
 
     /*
     * FUNCTION: generate_sql_from_ollama
@@ -54,6 +61,7 @@ create or replace PACKAGE BODY pkg_ollama AS
         l_sql             CLOB;
         l_bad_tokens      VARCHAR2(4000);
         l_system_prompt   CLOB;
+        l_validation      VARCHAR2(4000);
     BEGIN
         -- Build schema metadata if table provided
         IF p_table_name IS NOT NULL THEN
@@ -66,7 +74,8 @@ create or replace PACKAGE BODY pkg_ollama AS
                    RETURNING CLOB)
             INTO l_metadata_json
             FROM all_tab_columns
-            WHERE table_name = UPPER(p_table_name)
+            WHERE --table_name = UPPER(p_table_name)
+            INSTR(':'||NVL(UPPER(p_table_name),table_name)||':', ':' || table_name || ':') > 0
               AND owner = SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA');
         ELSE
             l_metadata_json := '[]';
@@ -131,7 +140,7 @@ create or replace PACKAGE BODY pkg_ollama AS
                    )
             INTO l_sql
             FROM dual;
-        EXCEPTION
+         EXCEPTION
             WHEN OTHERS THEN
                 -- fallback: use whole response if JSON extraction failed
                 l_sql := l_response;
@@ -169,6 +178,12 @@ create or replace PACKAGE BODY pkg_ollama AS
         IF l_bad_tokens IS NOT NULL AND LENGTH(TRIM(l_bad_tokens)) > 0 THEN
             RETURN 'Error: Non-Oracle SQL elements detected: ' || TRIM(l_bad_tokens)
                    || ' | Raw Response: ' || SUBSTR(l_response, 1, 2000);
+        END IF;
+
+       -- After extracting l_sql, before returning:
+        l_validation := validate_sql_syntax(l_sql);
+        IF l_validation != 'VALID' THEN
+        RETURN 'Error: Generated SQL failed validation: ' || l_validation;
         END IF;
 
         -- Final trim and return
@@ -230,21 +245,181 @@ create or replace PACKAGE BODY pkg_ollama AS
     * FUNCTION: validate_sql_syntax
     * Validates SQL syntax by attempting to parse it
     */
-    FUNCTION validate_sql_syntax (
+FUNCTION validate_sql_syntax (
         p_sql IN CLOB
     ) RETURN VARCHAR2
     IS
         l_cursor INTEGER;
-        l_dummy  INTEGER;
+        l_sql_upper VARCHAR2(32767);
+        l_sql_trimmed CLOB;
+        l_open_count INTEGER := 0;
+        l_close_count INTEGER := 0;
+        l_quote_count INTEGER := 0;
+        l_dquote_count INTEGER := 0;
+        i INTEGER;
+        l_len INTEGER;
+        l_char VARCHAR2(1);
+        l_prev_char VARCHAR2(1) := '';
+        l_in_string BOOLEAN := FALSE;
+        l_in_dquote BOOLEAN := FALSE;
     BEGIN
         IF p_sql IS NULL OR TRIM(p_sql) = '' THEN
             RETURN 'ERROR: Empty SQL statement';
         END IF;
 
-        -- Try to parse the SQL
+       -- Trim and normalize
+        l_sql_trimmed := replace(TRIM(p_sql),';','');
+        l_sql_upper := UPPER(SUBSTR(l_sql_trimmed, 1, 32767));
+        l_len := LENGTH(l_sql_trimmed);
+
+        -- ========== VALIDATION 1: Whitelist allowed statement types ==========
+        IF NOT REGEXP_LIKE(l_sql_upper, '^\s*(SELECT|INSERT|UPDATE|DELETE|MERGE|WITH)\s+', 'i') THEN
+            RETURN 'ERROR: [V1] Only SELECT, INSERT, UPDATE, DELETE, MERGE, or WITH statements are allowed';
+        END IF;
+
+        -- ========== VALIDATION 2: Reject DDL statements ==========
+        IF REGEXP_LIKE(l_sql_upper, '\b(DROP|TRUNCATE|ALTER|CREATE|RENAME|FLASHBACK|COMMENT)\b', 'i') THEN
+            RETURN 'ERROR: [V2] DDL operations are not permitted';
+        END IF;
+
+        -- ========== VALIDATION 3: Reject transaction control statements ==========
+        IF REGEXP_LIKE(l_sql_upper, '\b(GRANT|REVOKE|COMMIT|ROLLBACK|SAVEPOINT|LOCK|UNLOCK)\b', 'i') THEN
+            RETURN 'ERROR: [V3] Transaction control operations are not permitted';
+        END IF;
+
+        -- ========== VALIDATION 4: Reject PL/SQL blocks ==========
+        IF REGEXP_LIKE(l_sql_upper, '\b(DECLARE|BEGIN|END|PROCEDURE|FUNCTION|PACKAGE|TRIGGER|CURSOR)\b', 'i') THEN
+            RETURN 'ERROR: [V4] PL/SQL blocks are not permitted';
+        END IF;
+
+        -- ========== VALIDATION 5: Reject dynamic SQL execution ==========
+        IF REGEXP_LIKE(l_sql_upper, '\b(EXECUTE|DBMS_SQL|CALL|JAVA)\b', 'i') THEN
+            RETURN 'ERROR: [V5] Dynamic SQL execution is not permitted';
+        END IF;
+
+        -- ========== VALIDATION 6: Check for SQL comments (injection risk) ==========
+        IF INSTR(l_sql_upper, '/*') > 0 OR INSTR(l_sql_upper, '--') > 0 THEN
+            RETURN 'ERROR: [V6] SQL comments (/* */ and --) are not permitted';
+        END IF;
+
+        -- ========== VALIDATION 7: Check for balanced quotes and double quotes ==========
+        FOR i IN 1..l_len LOOP
+            l_char := SUBSTR(l_sql_trimmed, i, 1);
+            IF l_char = '''' AND l_prev_char != '\' THEN
+                l_quote_count := l_quote_count + 1;
+            ELSIF l_char = '"' THEN
+                l_dquote_count := l_dquote_count + 1;
+            END IF;
+            l_prev_char := l_char;
+        END LOOP;
+
+        IF MOD(l_quote_count, 2) != 0 THEN
+            RETURN 'ERROR: [V7] Unbalanced single quotes detected (count: ' || l_quote_count || ')';
+        END IF;
+
+        IF MOD(l_dquote_count, 2) != 0 THEN
+            RETURN 'ERROR: [V7] Unbalanced double quotes detected (count: ' || l_dquote_count || ')';
+        END IF;
+
+        -- ========== VALIDATION 8: Check for balanced parentheses ==========
+        FOR i IN 1..l_len LOOP
+            l_char := SUBSTR(l_sql_trimmed, i, 1);
+            IF l_char = '(' THEN
+                l_open_count := l_open_count + 1;
+            ELSIF l_char = ')' THEN
+                l_close_count := l_close_count + 1;
+            END IF;
+        END LOOP;
+
+        IF l_open_count != l_close_count THEN
+            RETURN 'ERROR: [V8] Unbalanced parentheses (open: ' || l_open_count || ', close: ' || l_close_count || ')';
+        END IF;
+
+        IF l_close_count > 0 AND l_close_count < l_open_count THEN
+            RETURN 'ERROR: [V8] Closing parenthesis before opening parenthesis detected';
+        END IF;
+
+        -- ========== VALIDATION 9: Check for multiple statements ==========
+        IF (LENGTH(l_sql_trimmed) - LENGTH(REPLACE(l_sql_trimmed, ';', ''))) > 1 THEN
+            RETURN 'ERROR: [V9] Multiple SQL statements detected; only one statement allowed';
+        END IF;
+
+        -- ========== VALIDATION 10: Detect non-Oracle SQL syntax ==========
+        IF REGEXP_LIKE(l_sql_upper, '\bLIMIT\s+\d+', 'i') THEN
+            RETURN 'ERROR: [V10] LIMIT is not Oracle syntax; use FETCH FIRST n ROWS ONLY or ROWNUM';
+        END IF;
+
+        IF REGEXP_LIKE(l_sql_upper, '\bTOP\s+\d+', 'i') THEN
+            RETURN 'ERROR: [V10] TOP is not Oracle syntax; use FETCH FIRST n ROWS ONLY';
+        END IF;
+
+        IF REGEXP_LIKE(l_sql_upper, '\bILIKE\b', 'i') THEN
+            RETURN 'ERROR: [V10] ILIKE is not Oracle syntax; use LIKE or REGEXP_LIKE';
+        END IF;
+
+        IF INSTR(l_sql_upper, 'ARRAY_AGG') > 0 THEN
+            RETURN 'ERROR: [V10] ARRAY_AGG is not Oracle syntax; use LISTAGG or JSON_ARRAYAGG';
+        END IF;
+
+        IF INSTR(l_sql_trimmed, '`') > 0 THEN
+            RETURN 'ERROR: [V10] Backticks (`) are not Oracle syntax; use double quotes for identifiers';
+        END IF;
+
+        IF REGEXP_LIKE(l_sql_upper, '\bSERIAL\b', 'i') THEN
+            RETURN 'ERROR: [V10] SERIAL is not Oracle syntax; use SEQUENCE';
+        END IF;
+
+        -- ========== VALIDATION 11: Prevent unrestricted UPDATE/DELETE ==========
+        IF REGEXP_LIKE(l_sql_upper, '^\s*UPDATE\s+', 'i') THEN
+            IF NOT REGEXP_LIKE(l_sql_upper, '\bWHERE\b', 'i') THEN
+                RETURN 'ERROR: [V11] UPDATE without WHERE clause is not permitted (data safety)';
+            END IF;
+        END IF;
+
+        IF REGEXP_LIKE(l_sql_upper, '^\s*DELETE\s+FROM\s+', 'i') THEN
+            IF NOT REGEXP_LIKE(l_sql_upper, '\bWHERE\b', 'i') THEN
+                RETURN 'ERROR: [V11] DELETE without WHERE clause is not permitted (data safety)';
+            END IF;
+        END IF;
+
+        -- ========== VALIDATION 12: Detect injection patterns ==========
+        /*IF REGEXP_LIKE(l_sql_upper, 'UNION\s+(ALL\s+)?SELECT', 'i') AND INSTR(l_sql_upper, 'WHERE') = 0 THEN
+            RETURN 'ERROR: [V12] UNION SELECT without WHERE detected (possible injection)';
+        END IF;*/
+
+        IF REGEXP_LIKE(l_sql_upper, '\bOR\s+''1''=''1''', 'i') THEN
+            RETURN 'ERROR: [V12] Classic SQL injection pattern detected';
+        END IF;
+
+        IF REGEXP_LIKE(l_sql_upper, '\bOR\s+1=1', 'i') THEN
+            RETURN 'ERROR: [V12] SQL injection pattern (1=1) detected';
+        END IF;
+
+        -- ========== VALIDATION 13: Check for suspicious schema access ==========
+        IF REGEXP_LIKE(l_sql_upper, '\b(SYS|SYSTEM|DBMS|ALL_|USER_|DBA_|V_)\$?[A-Z_]+', 'i') AND 
+           REGEXP_LIKE(l_sql_upper, 'SELECT.*FROM.*\b(SYS|SYSTEM|DBA_)', 'i') THEN
+            RETURN 'ERROR: [V13] Access to system/admin objects is not permitted';
+        END IF;
+
+        -- ========== VALIDATION 14: Validate proper SQL termination ==========
+       -- Validate ending character is only a letter or digit
+        IF NOT REGEXP_LIKE(l_sql_trimmed, '[A-Za-z0-9]$') THEN
+           RETURN 'ERROR: [V14] SQL statement must end with a letter or number';
+        END IF;
+
+        -- ========== VALIDATION 15: Check for malformed keywords ==========
+        IF REGEXP_LIKE(l_sql_upper, '\bFROM\s+FROM\b', 'i') OR 
+           REGEXP_LIKE(l_sql_upper, '\bWHERE\s+WHERE\b', 'i') OR
+           REGEXP_LIKE(l_sql_upper, '\bAND\s+AND\b', 'i') OR
+           REGEXP_LIKE(l_sql_upper, '\bOR\s+OR\b', 'i') OR
+           REGEXP_LIKE(l_sql_upper, '\bJOIN\s+JOIN\b', 'i') THEN
+            RETURN 'ERROR: [V15] Duplicate/malformed keywords detected';
+        END IF;
+
+        -- ========== VALIDATION 16: Parse SQL syntax with DBMS_SQL ==========
         l_cursor := DBMS_SQL.OPEN_CURSOR;
         BEGIN
-            DBMS_SQL.PARSE(l_cursor, p_sql, DBMS_SQL.NATIVE);
+            DBMS_SQL.PARSE(l_cursor, l_sql_trimmed, DBMS_SQL.NATIVE);
             DBMS_SQL.CLOSE_CURSOR(l_cursor);
             RETURN 'VALID';
         EXCEPTION
@@ -252,8 +427,9 @@ create or replace PACKAGE BODY pkg_ollama AS
                 IF DBMS_SQL.IS_OPEN(l_cursor) THEN
                     DBMS_SQL.CLOSE_CURSOR(l_cursor);
                 END IF;
-                RETURN 'ERROR: ' || SQLERRM;
+                RETURN 'ERROR: [V16] ' || SQLERRM;
         END;
+
     END validate_sql_syntax;
 
     /*
@@ -295,7 +471,7 @@ create or replace PACKAGE BODY pkg_ollama AS
 
         -- Step 3: Execute and get results as JSON
         BEGIN
-            p_results := query_to_json_array(l_generated_sql);
+            p_results := query_to_json_array(replace(l_generated_sql,';',''));
             
             -- Check if execution resulted in error
             IF p_results LIKE '{"error":%' THEN
