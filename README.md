@@ -43,7 +43,7 @@ These functions let you send a prompt (optionally including a table schema from 
 
 1. Change directory to sql/ and run the SQL script to create the package:
 ```sql
-@sql/install_ollama_pkg.sql
+@install_ollama_pkg.sql
 ```
 3. Test with the example in `examples/test_call.sql`.
 
