@@ -7,7 +7,7 @@ create or replace PACKAGE pkg_ollama AS
     */
 
      --audit log
-    PROCEDURE ollama_audit_log_prc (
+    PROCEDURE Ollama_audit_log_prc (
         p_table_name       VARCHAR2 DEFAULT NULL,
         p_model            VARCHAR2 DEFAULT NULL,
         p_user_prompt      CLOB DEFAULT NULL,
