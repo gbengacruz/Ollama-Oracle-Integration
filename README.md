@@ -122,7 +122,7 @@ END;
 
 ## Troubleshooting
 
-- `APEX_WEB_SERVICE` errors: ensure APEX is installed and configured. Some DBs require the `APEX_040200` (or version) schema components.
+- `APEX_WEB_SERVICE` errors: ensure APEX is installed and configured. Some DBs require the `APEX_240200` (or version) schema components.
 - `ORA-24247`: configure network ACLs:
 ```sql
 BEGIN
