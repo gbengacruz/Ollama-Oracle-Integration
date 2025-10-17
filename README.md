@@ -60,8 +60,8 @@ DECLARE
     l_sql CLOB;
 BEGIN
     l_sql := pkg_ollama.generate_sql_from_ollama(
-        p_table_name => 'EMPLOYEES',
-        p_user_prompt => 'show me the top 5 highest paid employees'
+        p_table_name => 'EMPLOYEES:DEPARTMENTS',
+        p_user_prompt => 'show top 5 paid staff and the department name'
     );
     DBMS_OUTPUT.PUT_LINE('Generated SQL: ' || l_sql);
 END;
@@ -70,15 +70,15 @@ END;
 <img src="img/ollama 1.png" alt="ollama1" width="1028" height="1080"/>
 
 ```sql
--- Example 2: Complete workflow with execution with json results
+-- Example 2: Complete workflow to generate sql, execution and return the json results
 DECLARE
     l_results CLOB;
     l_status  VARCHAR2(100);
     l_error   VARCHAR2(4000);
 BEGIN
     pkg_ollama.execute_generated_sql(
-        p_table_name => 'SALES',
-        p_user_prompt => 'show monthly sales trends for 2024',
+        p_table_name => 'EMPLOYEES:DEPARTMENTS',
+        p_user_prompt => 'show top 5 paid staff and the department name',
         p_results => l_results,
         p_status => l_status,
         p_error_msg => l_error
