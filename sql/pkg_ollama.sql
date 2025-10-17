@@ -6,6 +6,19 @@ create or replace PACKAGE pkg_ollama AS
     * Version: 1.0
     */
 
+     --audit log
+    PROCEDURE ollama_audit_log_prc (
+        p_table_name       VARCHAR2 DEFAULT NULL,
+        p_model            VARCHAR2 DEFAULT NULL,
+        p_user_prompt      CLOB DEFAULT NULL,
+        p_request_body     CLOB DEFAULT NULL,
+        p_response_json    CLOB DEFAULT NULL,
+        p_generated_sql    CLOB DEFAULT NULL,
+        p_execution_result CLOB DEFAULT NULL,
+        p_status           VARCHAR2 DEFAULT NULL,
+        p_error_message    CLOB DEFAULT NULL
+    ) ;
+
     -- Function 1: Convert any query result to JSON array
     FUNCTION query_to_json_array (
         p_query IN CLOB
