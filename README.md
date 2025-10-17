@@ -111,21 +111,6 @@ END;
 
 ---
 
-## Files
-
-### `sql/pkg_ollama.sql` ,  `sql/pkg_ollama.plb`
-Creates `pkg_ollama` — a complete package that:
-- Optionally builds a table schema context from `USER_TAB_COLUMNS` when `p_table_name` is supplied.
-- Constructs a JSON body and posts to the Ollama `/api/generate` endpoint.
-- Extracts `$.response` from the returned JSON and strips Markdown code fences if present.
-
-> See the SQL file for the full implementation.
-
-### `examples/test_call.sql`
-A small test script demonstrating how to call the function and print the first 4000 characters of the response.
-
----
-
 ## Security & Hardening
 
 - Do **not** hardcode secrets in PL/SQL. If Ollama requires authentication in your deployment, store tokens securely (Oracle Wallet, Vault, or protected table with restricted grants).
