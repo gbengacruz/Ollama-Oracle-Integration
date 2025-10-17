@@ -5,7 +5,7 @@
 --  DDL for Table OLLAMA_AUDIT_LOG
 --------------------------------------------------------
 
-  CREATE TABLE "HRMS"."OLLAMA_AUDIT_LOG" 
+  CREATE TABLE "OLLAMA_AUDIT_LOG" 
    (	"AUDIT_ID" NUMBER, 
 	"CREATED_AT" TIMESTAMP (6) WITH TIME ZONE DEFAULT SYSTIMESTAMP, 
 	"REQUESTOR" VARCHAR2(200 BYTE) COLLATE "USING_NLS_COMP", 
@@ -19,11 +19,6 @@
 	"STATUS" VARCHAR2(50 BYTE) COLLATE "USING_NLS_COMP", 
 	"ERROR_MESSAGE" CLOB COLLATE "USING_NLS_COMP"
    ) ;
---------------------------------------------------------
---  DDL for Index SYS_C00102114
---------------------------------------------------------
-
-  CREATE UNIQUE INDEX "SYS_C00102114" ON "OLLAMA_AUDIT_LOG" ("AUDIT_ID");
 --------------------------------------------------------
 --  DDL for Trigger OLLAMA_AUDIT_LOG_TRG
 --------------------------------------------------------
