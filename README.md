@@ -66,6 +66,8 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Generated SQL: ' || l_sql);
 END;
 /
+<img src="img/ollama1.png" alt="ollama1" width="800" height="500"/>
+
 
 -- Example 2: Complete workflow with execution with json results
 DECLARE
@@ -88,6 +90,7 @@ BEGIN
     END IF;
 END;
 /
+<img src="img/ollama2.png" alt="ollama2" width="800" height="500"/>
 
 -- Example 3: Get AI insights
 DECLARE
@@ -100,6 +103,8 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Insight: ' || l_insight);
 END;
 /
+<img src="img/ollama3.png" alt="ollama3" width="800" height="500"/>
+
 ```
 
 ---
