@@ -41,10 +41,9 @@ These functions let you send a prompt (optionally including a table schema from 
 
 ## Deployment
 
-1. Run the SQL script to create the package:
+1. Change directory to sql/ and run the SQL script to create the package:
 ```sql
-@sql/pkg_ollama.sql
-@sql/pkg_ollama.plb
+@sql/install_ollama_pkg.sql
 ```
 3. Test with the example in `examples/test_call.sql`.
 
