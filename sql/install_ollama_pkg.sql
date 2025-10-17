@@ -33,5 +33,6 @@ PROMPT Package body created.
 SHOW ERRORS
 
 PROMPT ========================================
-PROMPT ✅ OLLAMA Integration Installed Successfully
+PROMPT OLLAMA Integration Installed Successfully
 PROMPT ========================================
+
