@@ -1,7 +1,7 @@
 create or replace PACKAGE BODY pkg_ollama AS
 
     -- Constants for configuration
-    gc_ollama_endpoint CONSTANT VARCHAR2(500) := 'https://oci.dropletssoftware.com/ollama/api/generate';
+    gc_ollama_endpoint CONSTANT VARCHAR2(500) := 'http://localhost:11434/api/generate';
     gc_default_model   CONSTANT VARCHAR2(100) := 'llama3.1:8b';
     gc_success_status  CONSTANT VARCHAR2(100) := 'Succeeded';
     gc_fail_status     CONSTANT VARCHAR2(100) := 'Failed';
