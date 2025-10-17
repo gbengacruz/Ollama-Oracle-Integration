@@ -66,7 +66,7 @@ BEGIN
 END;
 /
 ```
-<img src="img/ollama 1.png" alt="ollama1" width="1028" height="800"/>
+<img src="img/ollama 1.png" alt="ollama1" width="1028" height="1080"/>
 
 ```sql
 -- Example 2: Complete workflow with execution with json results
@@ -91,7 +91,7 @@ BEGIN
 END;
 /
 ```
-<img src="img/ollama 2.png" alt="ollama2" width="1028" height="800"/>
+<img src="img/ollama 2.png" alt="ollama2" width="1028" height="1080"/>
 
 ```sql
 -- Example 3: Get AI insights
@@ -107,7 +107,7 @@ END;
 /
 ```
 
-<img src="img/ollama 3.png" alt="ollama 3" width="1028" height="800"/>
+<img src="img/ollama 3.png" alt="ollama 3" width="1028" height="1080"/>
 
 ---
 
