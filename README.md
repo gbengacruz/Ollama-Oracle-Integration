@@ -39,8 +39,6 @@ These functions let you send a prompt (optionally including a table schema from 
     GRANT EXECUTE ON APEX_WEB_SERVICE TO <your_schema>;</br>
     GRANT EXECUTE ON APEX_JSON TO <your_schema>;</br>
     GRANT EXECUTE ON APEX_UTIL TO <your_schema>;
-5. (Optional) Install ollama or replace gc_ollama_endpoint on the package pkg_ollama with the existing ollama api url.
-6. (Optional) If you intend to log queries and responses, create a secure schema/table to store logs.
 
 **Common issue:** `ORA-24247: network access denied by access control list (ACL)` — fix by creating and granting an ACL with `DBMS_NETWORK_ACL_ADMIN` or via Oracle DB security admin.
 
