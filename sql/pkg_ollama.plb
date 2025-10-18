@@ -2,6 +2,7 @@ create or replace PACKAGE BODY pkg_ollama AS
 
     -- Constants for configuration
     gc_ollama_endpoint CONSTANT VARCHAR2(500) := 'http://localhost:11434/api/generate';
+    gc_ollama_api_key  CONSTANT VARCHAR2(100) := 'skLocal_1a2b3c4d5e6f7xxxxxxxxxxxxxxx';
     gc_default_model   CONSTANT VARCHAR2(100) := 'llama3.1:8b';
     gc_success_status  CONSTANT VARCHAR2(100) := 'Succeeded';
     gc_fail_status     CONSTANT VARCHAR2(100) := 'Failed';
@@ -188,8 +189,17 @@ create or replace PACKAGE BODY pkg_ollama AS
         l_payload := apex_json.get_clob_output;
         apex_json.free_output;
 
+        apex_web_service.set_request_headers(
+            p_name_01        => 'Content-Type',
+            p_value_01       => 'application/json',
+            p_name_02        => 'User-Agent',
+            p_value_02       => 'APEX',
+            p_name_03        => 'X-API-Key',
+            p_value_03       => gc_ollama_api_key);
+
         -- Call Ollama REST API
-        l_response := apex_web_service.make_rest_request(p_url => gc_ollama_endpoint, p_http_method => 'POST', p_body => l_payload);
+        l_response := apex_web_service.make_rest_request(p_url => gc_ollama_endpoint, p_http_method => 'POST', p_body => l_payload,p_parm_name => apex_util.string_to_table
+        ('Content-Type'), p_parm_value => apex_util.string_to_table('application/json'));
 
         -- Extract model response (final non-streamed response lives in $.response)
         BEGIN
@@ -313,9 +323,17 @@ create or replace PACKAGE BODY pkg_ollama AS
         l_payload := apex_json.get_clob_output;
         apex_json.free_output;
 
-        -- Call Ollama REST API
-        l_response := apex_web_service.make_rest_request(p_url => gc_ollama_endpoint, p_http_method => 'POST', p_body => l_payload, p_parm_name => apex_util.string_to_table
-        ('Content-Type: application/json'), p_parm_value => apex_util.string_to_table('application/json'));
+          apex_web_service.set_request_headers(
+            p_name_01        => 'Content-Type',
+            p_value_01       => 'application/json',
+            p_name_02        => 'User-Agent',
+            p_value_02       => 'APEX',
+            p_name_03        => 'X-API-Key',
+            p_value_03       => gc_ollama_api_key);
+
+    
+         -- Call Ollama REST API
+        l_response := apex_web_service.make_rest_request(p_url => gc_ollama_endpoint, p_http_method => 'POST', p_body => l_payload);
 
         -- Extract the insight text from JSON response
         l_insight := JSON_VALUE(l_response, '$.response');
