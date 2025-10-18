@@ -122,7 +122,7 @@ create or replace PACKAGE BODY pkg_ollama AS
                 RETURNING CLOB)
             INTO l_metadata_json
             FROM
-                all_tab_columns
+                user_tab_columns
             WHERE
                     instr(':'
                           || p_table_name
