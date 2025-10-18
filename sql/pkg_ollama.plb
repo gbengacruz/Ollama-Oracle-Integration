@@ -198,8 +198,7 @@ create or replace PACKAGE BODY pkg_ollama AS
             p_value_03       => gc_ollama_api_key);
 
         -- Call Ollama REST API
-        l_response := apex_web_service.make_rest_request(p_url => gc_ollama_endpoint, p_http_method => 'POST', p_body => l_payload,p_parm_name => apex_util.string_to_table
-        ('Content-Type'), p_parm_value => apex_util.string_to_table('application/json'));
+        l_response := apex_web_service.make_rest_request(p_url => gc_ollama_endpoint, p_http_method => 'POST', p_body => l_payload);
 
         -- Extract model response (final non-streamed response lives in $.response)
         BEGIN
