@@ -32,7 +32,7 @@ These functions let you send a prompt (optionally including a table schema from 
 1. Oracle Database (12c+ recommended) with `APEX_WEB_SERVICE` package available (APEX).
 2. Install ollama and pull the llama3 model on your local server (Check https://ollama.com/ for instructions)
 3. Network access from the database host to the Ollama server (or proxy). If the DB server blocks outbound HTTP(S), configure Oracle Network ACLs.
-4. Database user with privileges  CONNECT, RESOURCE, DBMS_SQL, APEX_WEB_SERVICE, APEX_JSON, APEX_UTIL
+4. Database user with privileges  CONNECT, RESOURCE, DBMS_SQL, APEX_WEB_SERVICE, APEX_JSON, APEX_UTIL </br>
     -- If schema is restricted, connect as DBA/SYSTEM/ADMIN user, then:</br>
     GRANT CONNECT, RESOURCE TO <your_schema>;</br>
     GRANT EXECUTE ON DBMS_SQL TO <your_schema>;</br>
