@@ -50,6 +50,8 @@ These functions let you send a prompt (optionally including a table schema from 
 ```sql
 @install_ollama_pkg.sql
 ```
+Update gc_ollama_endpoint abd gc_ollama_api_key CONSTANT package body pkg_ollama is neccessary
+
 3. Test with the example in `examples/test_call.sql`.
 
 ---
