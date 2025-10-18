@@ -33,11 +33,11 @@ These functions let you send a prompt (optionally including a table schema from 
 2. Install ollama and pull the llama3 model on your local server (Check https://ollama.com/ for instructions)
 3. Network access from the database host to the Ollama server (or proxy). If the DB server blocks outbound HTTP(S), configure Oracle Network ACLs.
 4. Database user with privileges  CONNECT, RESOURCE, DBMS_SQL, APEX_WEB_SERVICE, APEX_JSON, APEX_UTIL
-    -- If schema is restricted, connect as DBA/SYSTEM/ADMIN user, then:
-    GRANT CONNECT, RESOURCE TO <your_schema>;
-    GRANT EXECUTE ON DBMS_SQL TO <your_schema>;
-    GRANT EXECUTE ON APEX_WEB_SERVICE TO <your_schema>;
-    GRANT EXECUTE ON APEX_JSON TO <your_schema>;
+    -- If schema is restricted, connect as DBA/SYSTEM/ADMIN user, then:</br>
+    GRANT CONNECT, RESOURCE TO <your_schema>;</br>
+    GRANT EXECUTE ON DBMS_SQL TO <your_schema>;</br>
+    GRANT EXECUTE ON APEX_WEB_SERVICE TO <your_schema>;</br>
+    GRANT EXECUTE ON APEX_JSON TO <your_schema>;</br>
     GRANT EXECUTE ON APEX_UTIL TO <your_schema>;
 5. (Optional) Install ollama or replace gc_ollama_endpoint on the package pkg_ollama with the existing ollama api url.
 6. (Optional) If you intend to log queries and responses, create a secure schema/table to store logs.
