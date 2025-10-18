@@ -6,7 +6,6 @@ This repository provides Oracle PL/SQL integration examples for invoking an Olla
 - `sql/pkg_ollama.sql, sql/pkg_ollama.plb`  — production-ready PL/SQL package (based on user-provided code) that calls Ollama and returns a CLOB response.
 - `examples/test_call.sql` — example anonymous block showing how to call the function.
 - `images/architecture.png` — architecture diagram.
-- `Supported Models` —  llama 3
 - `LICENSE` — MIT license.
 
 > Architecture diagram:
@@ -22,7 +21,7 @@ These functions let you send a prompt (optionally including a table schema from 
 
 **Design goals**
 - Minimal, easy-to-deploy PL/SQL function.
-- Optionally include the database table schema to provide context to the model.
+- Optionally include the database table schema to provide context to the model and return JSON results.
 - Clear error handling and a useful example for testing.
 - Supported model - llama
 
