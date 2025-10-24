@@ -7,17 +7,17 @@
 
 create table "OLLAMA_AUDIT_LOG" (
    "AUDIT_ID"         number primary key,
-   "CREATED_AT"       timestamp(6) with time zone default systimestamp,
-   "REQUESTOR"        varchar2(200 byte) collate "USING_NLS_COMP",
-   "TABLE_NAME"       varchar2(128 byte) collate "USING_NLS_COMP",
-   "MODEL"            varchar2(200 byte) collate "USING_NLS_COMP",
-   "USER_PROMPT"      clob collate "USING_NLS_COMP",
-   "REQUEST_BODY"     clob collate "USING_NLS_COMP",
-   "RESPONSE_JSON"    clob collate "USING_NLS_COMP",
-   "GENERATED_SQL"    clob collate "USING_NLS_COMP",
-   "EXECUTION_RESULT" clob collate "USING_NLS_COMP",
-   "STATUS"           varchar2(50 byte) collate "USING_NLS_COMP",
-   "ERROR_MESSAGE"    clob collate "USING_NLS_COMP"
+   "CREATED_AT"       timestamp(6) ,
+   "REQUESTOR"        varchar2(200 byte),
+   "TABLE_NAME"       varchar2(128 byte),
+   "MODEL"            varchar2(200 byte),
+   "USER_PROMPT"      clob,
+   "REQUEST_BODY"     clob, 
+   "RESPONSE_JSON"    clob,
+   "GENERATED_SQL"    clob,
+   "EXECUTION_RESULT" clob,
+   "STATUS"           varchar2(50 byte),
+   "ERROR_MESSAGE"    clob
 );
 
 --------------------------------------------------------
